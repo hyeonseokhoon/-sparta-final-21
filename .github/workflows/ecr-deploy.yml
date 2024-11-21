@@ -24,13 +24,16 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: AWS ECR에 로그인
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ap-northeast-2
+
+      - name: Login to Amazon ECR
         id: login-ecr
-        uses: aws-actions/amazon-ecr-login@v2
-        env:
-          AWS_ACCESS_KEY_ID: AKIAST6S7OOMBEVHKCPH
-          AWS_SECRET_ACCESS_KEY: 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
-          AWS_REGION: ap-northeast-2
+        uses: aws-actions/amazon-ecr-login@v1
 
       - name: Docker Compose로 이미지 빌드 및 푸시
         env:
@@ -38,6 +41,15 @@ jobs:
           ECR_REPOSITORY: gathering-21/monolog
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         run: |
+          # create application.yml
+          cd ./src/main/resources
+          
+          # application.yml file 생성하기
+          touch ./application.yml
+          
+          # secrets 값을 application.yml에 쓰기
+          echo "${{ secrets.APPLICATION_VALUE }}" >> ./application.yml
+          
           # Docker Compose 를 사용하여 서비스 빌드
           docker compose -f docker-compose.yml build
           
