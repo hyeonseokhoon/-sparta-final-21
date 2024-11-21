@@ -35,11 +35,7 @@ jobs:
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v1
 
-      - name: Docker Compose로 이미지 빌드 및 푸시
-        env:
-          AWS_REGION: ap-northeast-2
-          ECR_REPOSITORY: gathering-21/monolog
-          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+      - name: make application.yml
         run: |
           # create application.yml
           cd ./src/main/resources
@@ -49,10 +45,15 @@ jobs:
           
           # secrets 값을 application.yml에 쓰기
           echo "${{ secrets.APPLICATION_VALUE }}" >> ./application.yml
-          
+
+      - name: Docker Compose로 이미지 빌드 및 푸시
+        env:
+          AWS_REGION: ap-northeast-2
+          ECR_REPOSITORY: gathering-21/monolog
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        run: |
           # Docker Compose 를 사용하여 서비스 빌드
-          cd /
-          docker compose -f ./docker-compose.yml build
+          docker compose -f docker-compose.yml build
           
           # 태그를 설정하고 ECR 로 푸시
           docker tag gathering-21-build:latest $ECR_REGISTRY/$ECR_REPOSITORY:${GITHUB_SHA::7}
