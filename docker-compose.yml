@@ -11,12 +11,8 @@ services:
     ports:
       - "8080:8080"
     depends_on:
-      - redis
-    command:
-      - bash
-      - -c
-      - |
-        ./wait-for-it.sh redis:6379 -s -t 100
+      redis:
+        condition: service_healthy
     networks:
       - app-network
     restart: on-failure
