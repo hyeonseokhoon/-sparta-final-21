@@ -35,12 +35,12 @@ jobs:
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v1
 
-      - name: make application.yml task-depenition
+      - name: Download existing task definition
         run: |
-          # create monolog-fy.json
-          touch ./monolog-fy.json
-          echo "${{ secrets.ECS_TASK_DEFNITION }}" >> ./monolog-fy.json
-          
+          aws ecs describe-task-definition --task-definition ${{ env.ECS_TASK_DEFINITION }} --query taskDefinition > task-definition.json
+
+      - name: make application.yml
+        run: |
           # create application.yml
           cd ./src/main/resources
           
@@ -76,7 +76,7 @@ jobs:
         id: render-task-definition
         uses: aws-actions/amazon-ecs-render-task-definition@v1.1.3
         with:
-          task-definition: ./monolog-fy.json # 베이스가 될 Task definition json 파일 경로
+          task-definition: task-definition.json # 베이스가 될 Task definition json 파일 경로
           container-name: monolog-container # 컨테이너명
           image: ${{ steps.build-push-docker-image.outputs.image }}
 
