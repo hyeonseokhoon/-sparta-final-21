@@ -37,7 +37,7 @@ jobs:
 
       - name: Download existing task definition
         run: |
-          aws ecs describe-task-definition --task-definition ${{ env.ECS_TASK_DEFINITION }} --query taskDefinition > task-definition.json
+          aws ecs describe-task-definition --task-definition monolog-fy:2 --query taskDefinition > task-definition.json
 
       - name: make application.yml
         run: |
