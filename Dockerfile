@@ -21,5 +21,9 @@ ARG DEV_SERVER_PORT=8080
 ENV DEV_SERVER_PORT=${DEV_SERVER_PORT}
 EXPOSE ${DEV_SERVER_PORT}
 
+# wait-for-it 스크립트 복사
+COPY wait-for-it.sh wait-for-it.sh
+RUN chmod +x wait-for-it.sh
+
 # 애플리케이션 실행 명령어
 ENTRYPOINT ["sh", "-c", "java -jar /app.jar --server.port=${DEV_SERVER_PORT}"]

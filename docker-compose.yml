@@ -15,8 +15,12 @@ services:
     env_file:
       - .env.dev
     depends_on:
-      # - db
       - redis
+    command:
+      - bash
+      - -c
+      - |
+        ./wait-for-it.sh redis:6379 -s -t 100
     networks:
       - app-network
     restart: on-failure
